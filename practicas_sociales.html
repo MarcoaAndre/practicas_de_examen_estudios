@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prácticas – Estudios Sociales</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --bg: #0e0e0e;
+  --surface: #161616;
+  --border: #2a2a2a;
+  --text: #e8e0d0;
+  --muted: #888;
+  --t1: #e8a020;   /* luchas - amber */
+  --t2: #5db8a0;   /* mujer - teal */
+  --t3: #c05050;   /* reforma - crimson */
+  --t4: #6a7fc0;   /* guerra - slate blue */
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Crimson Pro', serif;
+  font-weight: 300;
+  min-height: 100vh;
+}
+
+/* ── HOME ── */
+#home {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: radial-gradient(ellipse at 20% 50%, #1a140800 0%, #e8a01008 60%, transparent 100%),
+              radial-gradient(ellipse at 80% 20%, #5db8a008 0%, transparent 60%);
+}
+
+.home-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.4rem, 8vw, 5rem);
+  letter-spacing: 0.06em;
+  text-align: center;
+  line-height: 1;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--text) 30%, var(--t1));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.home-sub {
+  font-size: 1rem;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 60px;
+  font-style: italic;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  max-width: 900px;
+  width: 100%;
+}
+
+.topic-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 24px;
+  cursor: pointer;
+  transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+.topic-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s;
+}
+.topic-card:hover::before { transform: scaleX(1); }
+.topic-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  box-shadow: 0 8px 32px -8px var(--accent-glow);
+}
+
+.card-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3.5rem;
+  line-height: 1;
+  opacity: 0.12;
+  position: absolute;
+  top: 16px; right: 20px;
+  color: var(--accent);
+}
+.card-icon { font-size: 2rem; margin-bottom: 12px; }
+.card-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.card-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.5; }
+.card-count {
+  margin-top: 16px;
+  font-size: 0.78rem;
+  color: var(--accent);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── QUIZ VIEW ── */
+#quiz-view { display: none; min-height: 100vh; }
+
+.quiz-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.back-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Crimson Pro', serif;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+.back-btn:hover { border-color: var(--qcolor); color: var(--qcolor); }
+.quiz-header-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem;
+  letter-spacing: 0.05em;
+  color: var(--qcolor);
+  flex: 1;
+}
+.progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.progress-bar {
+  width: 80px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--qcolor);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.quiz-body {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 40px 20px 60px;
+}
+
+.q-block {
+  margin-bottom: 36px;
+  animation: slideIn 0.3s ease forwards;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.q-number {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  color: var(--qcolor);
+  margin-bottom: 8px;
+}
+.q-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.opt-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 12px 16px;
+  margin: 6px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Crimson Pro', serif;
+  font-size: 0.95rem;
+  transition: background 0.15s, border-color 0.15s;
+  line-height: 1.4;
+}
+.opt-btn:hover:not(:disabled) {
+  background: #1e1e1e;
+  border-color: var(--qcolor);
+}
+.opt-btn.correct {
+  background: #0d2b1a;
+  border-color: #3a9e62;
+  color: #7de0a4;
+}
+.opt-btn.wrong {
+  background: #2b0d0d;
+  border-color: #9e3a3a;
+  color: #e08080;
+}
+.opt-btn:disabled { cursor: default; }
+
+.feedback-box {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: #1a1a1a;
+  border-left: 3px solid var(--qcolor);
+  border-radius: 0 6px 6px 0;
+  font-size: 0.88rem;
+  color: #aaa;
+  font-style: italic;
+  display: none;
+  line-height: 1.5;
+}
+
+/* ── RESULTS ── */
+#result-view { display: none; min-height: 100vh; }
+.result-inner {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 60px 20px;
+  text-align: center;
+}
+.result-score {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(5rem, 20vw, 9rem);
+  line-height: 1;
+  color: var(--qcolor);
+  margin-bottom: 0;
+}
+.result-label {
+  font-size: 1.1rem;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.result-msg {
+  font-size: 1.35rem;
+  margin: 24px 0 16px;
+  line-height: 1.5;
+  color: var(--text);
+}
+.result-detail {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+.result-stars { font-size: 2rem; margin: 10px 0; letter-spacing: 4px; }
+
+.btn-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn-ghost {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Crimson Pro', serif;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+.btn-ghost:hover { border-color: var(--qcolor); color: var(--qcolor); }
+.btn-solid {
+  background: var(--qcolor);
+  border: none;
+  color: #000;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+  transition: opacity 0.2s;
+}
+.btn-solid:hover { opacity: 0.85; }
+
+.missed-list {
+  text-align: left;
+  margin: 30px 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.missed-item { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
+.missed-item:last-child { border-bottom: none; }
+.missed-item .mq { color: var(--text); margin-bottom: 4px; }
+.missed-item .ma { color: #3a9e62; font-size: 0.82rem; }
+.missed-hdr {
+  background: #1a1a1a;
+  padding: 10px 16px;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.08em;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home">
+  <div class="home-title">Prácticas<br>Sociales</div>
+  <div class="home-sub">Prueba Escrita #2 · I Período 2026 · Elige un tema</div>
+  <div class="cards-grid">
+    <div class="topic-card" style="--accent:var(--t1);--accent-glow:#e8a02044" onclick="startQuiz(0)">
+      <span class="card-num">01</span>
+      <div class="card-icon">⚔️</div>
+      <div class="card-title">Luchas Sociales</div>
+      <div class="card-desc">Gremios, sindicatos, demandas obreras y crisis económica de la primera mitad del siglo XX.</div>
+      <div class="card-count">10 preguntas · Pág. 19–23</div>
+    </div>
+    <div class="topic-card" style="--accent:var(--t2);--accent-glow:#5db8a044" onclick="startQuiz(1)">
+      <span class="card-num">02</span>
+      <div class="card-icon">👩</div>
+      <div class="card-title">La Mujer S. XX</div>
+      <div class="card-desc">Inserción laboral, movimientos feministas, Liga Feminista y participación política.</div>
+      <div class="card-count">10 preguntas · Pág. 24–27</div>
+    </div>
+    <div class="topic-card" style="--accent:var(--t3);--accent-glow:#c0505044" onclick="startQuiz(2)">
+      <span class="card-num">03</span>
+      <div class="card-icon">🏛️</div>
+      <div class="card-title">Reforma Social</div>
+      <div class="card-desc">Las cuatro reformas de Calderón Guardia, la alianza gobierno–Iglesia–comunistas y su importancia.</div>
+      <div class="card-count">10 preguntas · Pág. 29–31</div>
+    </div>
+    <div class="topic-card" style="--accent:var(--t4);--accent-glow:#6a7fc044" onclick="startQuiz(3)">
+      <span class="card-num">04</span>
+      <div class="card-icon">🔫</div>
+      <div class="card-title">Guerra Civil 1948</div>
+      <div class="card-desc">Bandos, causas, desarrollo del conflicto y consecuencias para la Segunda República.</div>
+      <div class="card-count">10 preguntas · Pág. 32–36</div>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz-view">
+  <div class="quiz-header">
+    <button class="back-btn" onclick="goHome()">← Volver</button>
+    <div class="quiz-header-title" id="qh-title"></div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
+      <span id="prog-text"></span>
+    </div>
+  </div>
+  <div class="quiz-body" id="quiz-body"></div>
+</div>
+
+<!-- RESULT -->
+<div id="result-view">
+  <div class="result-inner">
+    <div class="result-label">Tu puntaje</div>
+    <div class="result-score" id="res-score"></div>
+    <div class="result-label" id="res-of"></div>
+    <div class="result-stars" id="res-stars"></div>
+    <div class="result-msg" id="res-msg"></div>
+    <div class="result-detail" id="res-detail"></div>
+    <div id="missed-section"></div>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="goHome()">← Elegir otro tema</button>
+      <button class="btn-solid" id="retry-btn" onclick="retryQuiz()">Reintentar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TOPICS = [
+  {
+    id: 0,
+    title: "Luchas Sociales",
+    color: "var(--t1)",
+    questions: [
+      {
+        q: "¿Cuál es la diferencia fundamental entre un gremio y un sindicato?",
+        opts: [
+          "Los gremios solo existieron en el siglo XIX; los sindicatos son del siglo XX.",
+          "Un gremio agrupa personas del mismo oficio sin importar si son dueños o empleados; un sindicato es exclusivamente de trabajadores.",
+          "Los gremios tenían la Convención Colectiva como herramienta legal; los sindicatos no.",
+          "No existe diferencia real entre ambas formas de organización."
+        ],
+        correct: 1,
+        exp: "Los gremios agrupaban personas del mismo oficio (dueños y empleados incluidos). Los sindicatos son solo de trabajadores y negocian la Convención Colectiva."
+      },
+      {
+        q: "¿Qué es la Convención Colectiva y quién puede negociarla?",
+        opts: [
+          "Una ley del Congreso sobre el salario mínimo nacional.",
+          "Un acuerdo que solo puede negociar el gobierno con los gremios.",
+          "Un acuerdo con fuerza de ley entre empresa y empleados, que solo los sindicatos pueden negociar.",
+          "Una convención internacional de trabajadores latinoamericanos."
+        ],
+        correct: 2,
+        exp: "La Convención Colectiva es la herramienta legal exclusiva de los sindicatos. Tiene fuerza de ley entre la empresa y los empleados."
+      },
+      {
+        q: "¿Cuál fue la demanda principal de los artesanos y productores de manufacturas durante la crisis?",
+        opts: [
+          "Acceso a tierras improductivas del Estado.",
+          "Protección estatal de sus talleres y pequeñas empresas al borde de la quiebra.",
+          "Reducción de impuestos a las exportaciones.",
+          "Creación de un banco exclusivo para artesanos."
+        ],
+        correct: 1,
+        exp: "Los artesanos y productores de manufacturas pedían protección estatal de sus talleres y pequeñas empresas que estaban al borde de la quiebra por la crisis económica."
+      },
+      {
+        q: "¿En qué año los panaderos protestaron por mejoras salariales?",
+        opts: ["1900", "1903", "1910", "1920"],
+        correct: 1,
+        exp: "En 1903 los panaderos realizaron una de las primeras protestas documentadas por mejoras salariales en Costa Rica."
+      },
+      {
+        q: "¿Qué reclamaban los trabajadores en las huelgas de 1920?",
+        opts: [
+          "El derecho al voto universal.",
+          "La jornada laboral de 8 horas.",
+          "La abolición del trabajo infantil.",
+          "La creación de un partido obrero."
+        ],
+        correct: 1,
+        exp: "En 1920 se dieron huelgas en pro de la jornada de 8 horas de trabajo, uno de los grandes reclamos obreros de la época."
+      },
+      {
+        q: "¿Cuál fue el efecto de la crisis económica de los años 30 sobre los terratenientes y los trabajadores?",
+        opts: [
+          "Los terratenientes absorbieron todas las pérdidas para proteger a sus trabajadores.",
+          "El Estado intervino para proteger a los sectores más vulnerables.",
+          "Los terratenientes descargaron la crisis sobre los trabajadores con recortes de salarios y despidos.",
+          "La crisis no afectó a los sectores cafetaleros ni bananeros."
+        ],
+        correct: 2,
+        exp: "En las zonas cafetaleras y bananeras, terratenientes y transnacionales descargaron la crisis en los trabajadores mediante recortes de salarios y reducción de empleados."
+      },
+      {
+        q: "¿Qué demandaba el campesinado pobre durante la primera mitad del siglo XX?",
+        opts: [
+          "Acceso al crédito bancario a bajo interés.",
+          "Derecho a exportar café directamente.",
+          "Acceso a tierras privadas improductivas o aún sin colonizar.",
+          "Creación de cooperativas cafetaleras."
+        ],
+        correct: 2,
+        exp: "El campesinado pobre reclamaba el acceso a tierras privadas improductivas o sin colonizar como forma de resolver su precaria situación económica."
+      },
+      {
+        q: "¿Dónde residía la mayoría de los miembros de los gremios costarricenses?",
+        opts: ["En las zonas bananeras del Caribe.", "En el Valle Central.", "En la provincia de Guanacaste.", "En las zonas portuarias."],
+        correct: 1,
+        exp: "Los gremios estaban formados principalmente por trabajadores del Valle Central: zapateros, tabacaleros, herreros, entre otros."
+      },
+      {
+        q: "¿Qué movimiento ocurrió en 1922 relacionado con los costos de vida urbana?",
+        opts: [
+          "Huelga de trabajadores ferroviarios.",
+          "Movimiento popular contra el alza de los alquileres.",
+          "Protesta de panaderos por el precio del pan.",
+          "Marcha de mujeres por el derecho al voto."
+        ],
+        correct: 1,
+        exp: "En 1922 se produjo un movimiento popular contra el alza de los alquileres, reflejando el descontento por el deterioro de las condiciones de vida."
+      },
+      {
+        q: "¿Qué buscaban los artesanos al organizarse en sociedades desde finales del siglo XIX?",
+        opts: [
+          "Crear un partido político obrero.",
+          "Promover conciencia social y reflexionar sobre las problemáticas de la clase trabajadora.",
+          "Negociar directamente con el gobierno las tarifas de importación.",
+          "Establecer precios fijos para sus productos."
+        ],
+        correct: 1,
+        exp: "Desde finales del siglo XIX, los artesanos se organizaron en sociedades para promover conciencia social y reflexionar sobre las problemáticas y necesidades de la clase trabajadora."
+      }
+    ]
+  },
+  {
+    id: 1,
+    title: "La Mujer S. XX",
+    color: "var(--t2)",
+    questions: [
+      {
+        q: "¿Cuál era la situación legal de las mujeres durante la colonia y después de la independencia?",
+        opts: [
+          "Tenían plena igualdad legal con los hombres.",
+          "Podían votar pero no trabajar fuera del hogar.",
+          "Estaban subordinadas legalmente a los hombres, excluidas del espacio público y la violencia doméstica era legal.",
+          "Solo las mujeres de clase baja sufrían restricciones legales."
+        ],
+        correct: 2,
+        exp: "Las mujeres estaban subordinadas legalmente. La violencia doméstica era moralmente legitimada y legalmente posible. Eran excluidas de la política, el comercio y la producción cultural."
+      },
+      {
+        q: "¿En qué año se fundó la Liga Feminista y quién la presidió?",
+        opts: [
+          "1920, Carmen Lyra",
+          "1923, Ángela Acuña",
+          "1930, Luisa González",
+          "1914, Esther de Mezerville"
+        ],
+        correct: 1,
+        exp: "La Liga Feminista se fundó en 1923. La presidió Ángela Acuña, primera bachiller y primera abogada del país."
+      },
+      {
+        q: "¿Por qué la profesión docente fue especialmente significativa para las mujeres costarricenses?",
+        opts: [
+          "Porque era la profesión mejor remunerada del país.",
+          "Porque fue una de las primeras profesiones públicas accesibles a ellas, generando conciencia política.",
+          "Porque el gobierno la obligó como única opción laboral para mujeres.",
+          "Porque eliminó inmediatamente todas las brechas salariales."
+        ],
+        correct: 1,
+        exp: "La enseñanza fue una de las primeras profesiones públicas a las que las mujeres tuvieron acceso. Esto les permitió desarrollar conciencia social y política y asumir roles de liderazgo."
+      },
+      {
+        q: "¿Contra qué proyecto de ley luchó la Liga Feminista en 1924?",
+        opts: [
+          "Contra la ley que prohibía a las mujeres ejercer como abogadas.",
+          "Contra una ley que daba a los maestros hombres un aumento salarial especial por encima de las mujeres.",
+          "Contra la eliminación del Colegio de Señoritas.",
+          "Contra la restricción del voto femenino en elecciones municipales."
+        ],
+        correct: 1,
+        exp: "En 1924, la Liga Feminista se opuso al proyecto de ley donde los hombres recibirían un aumento salarial especial por encima del salario de las mujeres maestras."
+      },
+      {
+        q: "¿Qué papel jugaron las maestras en el Partido Comunista a partir de 1930?",
+        opts: [
+          "Fueron las fundadoras y líderes del partido.",
+          "Jugaron un papel protagónico en luchas sociales: Carmen Lyra, Luisa González, Adela Ferreto, entre otras.",
+          "Se limitaron a votar dentro del partido sin participar activamente.",
+          "Se opusieron al partido por considerarlo antifeminista."
+        ],
+        correct: 1,
+        exp: "Maestras, escritoras e intelectuales como Carmen Lyra, Luisa González, Adela Ferreto, Emilia Prieto y Lilia Ramos jugaron un papel protagónico en las luchas sociales del Partido Comunista."
+      },
+      {
+        q: "¿En qué consistió la participación de las mujeres en la campaña del Partido Reformista de 1923?",
+        opts: [
+          "Votaron por primera vez gracias a una reforma electoral.",
+          "Participaron activamente distribuyendo papeletas, en desfiles, reuniones y como oradoras.",
+          "Solo acompañaron a sus esposos a los actos políticos.",
+          "Fundaron su propio partido político paralelo al Reformista."
+        ],
+        correct: 1,
+        exp: "Las mujeres participaron activamente en la campaña del Partido Reformista de Jorge Volio: distribución de papeletas, desfiles, reuniones en plazas públicas, como oradoras, etc."
+      },
+      {
+        q: "¿Cuál fue la importancia de la Escuela Normal fundada en 1914?",
+        opts: [
+          "Fue la primera universidad para mujeres en Costa Rica.",
+          "Fue clave en el desarrollo educativo de las mujeres, dirigida por Brenes Mesén, García Monge y Omar Dengo.",
+          "Fue una escuela para hombres que luego se abrió a las mujeres en 1930.",
+          "Se especializó en la formación de enfermeras militares."
+        ],
+        correct: 1,
+        exp: "La Escuela Normal (1914) fue determinante en la educación de las mujeres. Fue dirigida por intelectuales clave: Roberto Brenes Mesén, Joaquín García Monge y Omar Dengo."
+      },
+      {
+        q: "¿Qué tipos de colegios para señoritas se fundaron entre 1872 y 1884?",
+        opts: [
+          "Colegios estatales con énfasis en ciencias y política.",
+          "Colegios vinculados a congregaciones religiosas como el María Auxiliadora y el Sagrado Corazón.",
+          "Academias militares para la formación de enfermeras.",
+          "Institutos técnicos para el aprendizaje de oficios."
+        ],
+        correct: 1,
+        exp: "Se fundaron colegios vinculados a congregaciones religiosas: Colegio María Auxiliadora (1872), Sagrado Corazón de Jesús en Cartago (1878) y en Heredia (1884). Tenían énfasis en formación moral y social."
+      },
+      {
+        q: "¿Cuál fue la actitud del movimiento obrero organizado por el Partido Comunista respecto al voto femenino?",
+        opts: [
+          "Se opuso firmemente por considerarlo una distracción de la lucha de clases.",
+          "Lo apoyó, aunque su foco principal era la participación de la mujer en el movimiento popular.",
+          "Lo impulsó como su lucha principal por encima de las reformas laborales.",
+          "Fue indiferente al tema del voto femenino."
+        ],
+        correct: 1,
+        exp: "El Partido Comunista apoyó el voto femenino, pero no lo constituyó como su lucha principal. Su atención estaba centrada en la participación de la mujer en el movimiento popular y las reformas sociales."
+      },
+      {
+        q: "¿Cuáles fueron las leyes que en 1885-1886 transformaron la educación secundaria y crearon instituciones clave?",
+        opts: [
+          "Ley de Educación Universitaria y Ley de Colegios Técnicos.",
+          "Ley Fundamental de Educación (1885) y Ley General de Educación Común (1886), que crearon el Liceo de CR y el Colegio de Señoritas.",
+          "Ley de Instrucción Primaria y Ley del Magisterio Nacional.",
+          "Ley de Acceso Femenino a la Educación y Ley de Igualdad de Género."
+        ],
+        correct: 1,
+        exp: "La Ley Fundamental de Educación (1885) y la Ley General de Educación Común (1886) establecieron la creación del Liceo de Costa Rica (1887) y el Colegio de Señoritas (1888)."
+      }
+    ]
+  },
+  {
+    id: 2,
+    title: "Reforma Social",
+    color: "var(--t3)",
+    questions: [
+      {
+        q: "¿En qué contexto social llegó al poder Calderón Guardia en 1940?",
+        opts: [
+          "Costa Rica vivía un período de prosperidad y estabilidad económica.",
+          "El país sufría desempleo, bajos salarios, pobreza, falta de vivienda y condiciones de salud precarias.",
+          "El principal problema era el conflicto fronterizo con Nicaragua.",
+          "La economía crecía pero faltaba infraestructura vial."
+        ],
+        correct: 1,
+        exp: "En 1940 la población vivía en condiciones muy difíciles: desempleo, bajos salarios, pobreza, falta de vivienda y agua, salud inadecuada. La mortalidad infantil llegaba a 90 por mil en zonas urbanas y más de 100 en rurales."
+      },
+      {
+        q: "¿Cuál fue la primera reforma del gobierno de Calderón y cuándo se realizó?",
+        opts: [
+          "El Código de Trabajo en 1943.",
+          "La CCSS en 1941.",
+          "La Universidad de Costa Rica en 1940.",
+          "Las Garantías Sociales en 1942."
+        ],
+        correct: 2,
+        exp: "La primera reforma fue la creación de la Universidad de Costa Rica en 1940, democratizando la educación superior y siendo la primera universidad estatal del país."
+      },
+      {
+        q: "¿Cómo se financia la Caja Costarricense del Seguro Social (CCSS)?",
+        opts: [
+          "Solo con impuestos al consumo.",
+          "Exclusivamente con aportes del gobierno central.",
+          "Con cuotas tripartitas: patronos, trabajadores y el Estado.",
+          "Con donaciones de organismos internacionales."
+        ],
+        correct: 2,
+        exp: "La CCSS se financia con un sistema tripartito: patronos, trabajadores y el Estado. Cubre enfermedades, maternidad y pensiones."
+      },
+      {
+        q: "¿Qué estableció el Código de Trabajo de 1943?",
+        opts: [
+          "La creación del seguro social obligatorio.",
+          "Los derechos y obligaciones de trabajadores y patronos, jornadas laborales y condiciones de trabajo.",
+          "El derecho al voto de los trabajadores.",
+          "La nacionalización de las empresas privadas."
+        ],
+        correct: 1,
+        exp: "El Código de Trabajo otorgó al país una legislación en materia de derecho laboral: derechos y obligaciones de trabajadores y patronos, jornadas de trabajo y garantía de condiciones de vida dignas."
+      },
+      {
+        q: "¿Cuáles son los derechos incluidos en las Garantías Sociales de 1942?",
+        opts: [
+          "Solo el derecho al voto y a la educación.",
+          "Derecho al trabajo, salario mínimo, huelga, vacaciones, seguros sociales, vivienda y protección del Estado.",
+          "Únicamente los derechos de los trabajadores del campo.",
+          "Solo los derechos de los empleados públicos."
+        ],
+        correct: 1,
+        exp: "Las Garantías Sociales incluyeron: derecho al trabajo, protección a la familia, salario mínimo, derecho a huelga, acceso a seguros sociales, vivienda y protección del Estado, y derecho a vacaciones."
+      },
+      {
+        q: "¿Por qué los sectores liberales y oligárquicos se opusieron a las reformas de Calderón?",
+        opts: [
+          "Porque Calderón no les consultó antes de promulgar las leyes.",
+          "Porque las vieron como una intervención del Estado y un ataque a sus intereses económicos.",
+          "Porque las reformas beneficiaban solo a los trabajadores del campo.",
+          "Porque Calderón prometió reformas pero nunca las implementó."
+        ],
+        correct: 1,
+        exp: "Los sectores liberales y más adinerados percibieron las reformas como una intervención del Estado y un ataque a sus intereses. Esto generó la ruptura de Calderón con los liberales y la oligarquía."
+      },
+      {
+        q: "¿Por qué el Partido Comunista cambió su nombre a Vanguardia Popular en 1943?",
+        opts: [
+          "Por exigencia del gobierno de Calderón como condición para la alianza.",
+          "Para crear una alianza política con el calderonismo y distanciarse de la imagen comunista.",
+          "Porque la Internacional Comunista lo ordenó desde Moscú.",
+          "Para poder participar en las elecciones de 1944."
+        ],
+        correct: 1,
+        exp: "En 1943 el Partido Comunista cambió su nombre a Vanguardia Popular para crear una alianza política con el calderonismo. Dicha alianza recibió el apoyo de Monseñor Sanabria."
+      },
+      {
+        q: "¿Cuál fue el papel de Monseñor Víctor Manuel Sanabria en las reformas sociales?",
+        opts: [
+          "Se opuso firmemente a todas las reformas por considerarlas comunistas.",
+          "Fue neutral, sin tomar ninguna posición pública.",
+          "Respaldó las reformas desde la doctrina social de la Iglesia, con visión progresista.",
+          "Solo apoyó la creación de la Universidad de Costa Rica."
+        ],
+        correct: 2,
+        exp: "Monseñor Sanabria, con visión progresista y sensibilidad social basada en la doctrina social de la Iglesia, respaldó las reformas de Calderón y la alianza gobierno-Iglesia-comunistas."
+      },
+      {
+        q: "¿Cómo generó problemas la declaración de guerra a las potencias del Eje en el gobierno de Calderón?",
+        opts: [
+          "Causó una invasión militar alemana a Costa Rica.",
+          "Generó rechazo en los grupos pro-alemanes vinculados a la oligarquía, que dominaban la banca y la producción.",
+          "Hizo que EE.UU. retirara su apoyo económico al país.",
+          "Provocó que México rompiera relaciones diplomáticas con Costa Rica."
+        ],
+        correct: 1,
+        exp: "La declaración de guerra a Alemania, Italia y Japón generó rechazo de Cortés y sus seguidores cercanos a familias alemanas, quienes junto con la oligarquía dominaban la banca, el café y el azúcar."
+      },
+      {
+        q: "¿Cuál es la importancia de la Universidad de Costa Rica como reforma social?",
+        opts: [
+          "Solo formaba profesionales para el sector privado.",
+          "Democratizó la educación superior, formó recursos humanos y fue la base del sistema de educación estatal.",
+          "Reemplazó la educación primaria y secundaria pública.",
+          "Solo admitía a estudiantes de familias oligárquicas para modernizar la élite."
+        ],
+        correct: 1,
+        exp: "La UCR democratizó la educación superior, contribuyó a la formación de recursos humanos y se convirtió en la base del sistema de educación estatal del país."
+      }
+    ]
+  },
+  {
+    id: 3,
+    title: "Guerra Civil 1948",
+    color: "var(--t4)",
+    questions: [
+      {
+        q: "¿Cuáles fueron los dos bandos principales de la Guerra Civil de 1948?",
+        opts: [
+          "Liberales vs. Conservadores.",
+          "Oficialismo (Calderonismo-Comunismo) vs. Oposición (Ejército de Liberación Nacional).",
+          "El ejército costarricense vs. fuerzas invasoras de Nicaragua.",
+          "El Partido Republicano vs. el Partido Liberación Nacional."
+        ],
+        correct: 1,
+        exp: "Los bandos fueron: el Oficialismo (alianza Calderonismo-Comunismo, con Calderón, Picado y Mora Valverde) vs. la Oposición del Ejército de Liberación Nacional (Figueres, Ulate, con el MLN y el Partido Unión Nacional)."
+      },
+      {
+        q: "¿Qué fue la Huelga de Brazos Caídos y cuándo ocurrió?",
+        opts: [
+          "Una huelga de bananeros en 1934 contra la United Fruit Company.",
+          "Un movimiento de 1947 donde trabajadores y ciudadanos pararon para denunciar el fraude electoral.",
+          "Una protesta obrera de 1920 por la jornada de 8 horas.",
+          "Una marcha campesina de 1940 por acceso a tierras."
+        ],
+        correct: 1,
+        exp: "La Huelga de Brazos Caídos (1947): trabajadores y ciudadanos suspendieron labores para denunciar el fraude en las elecciones de diputados de 1946 y exigir respeto a la democracia."
+      },
+      {
+        q: "¿Cuál fue la causa inmediata que detonó el conflicto armado de 1948?",
+        opts: [
+          "El asesinato de José Figueres por agentes del gobierno.",
+          "La invasión de fuerzas calderonistas al territorio de Guanacaste.",
+          "La anulación de las elecciones del 28 de febrero por el Congreso calderonista.",
+          "El golpe de Estado de Teodoro Picado contra Calderón."
+        ],
+        correct: 2,
+        exp: "El Congreso (mayoría calderonista) anuló las elecciones del 28 de febrero de 1948, donde Ulate había sido declarado ganador. Figueres respondió iniciando el levantamiento el 12 de marzo."
+      },
+      {
+        q: "¿Por qué la Guerra Fría fue un antecedente de la guerra civil costarricense?",
+        opts: [
+          "Porque EEUU invadió militarmente Costa Rica para eliminar el comunismo.",
+          "Porque la alianza del gobierno con los comunistas era mal vista por EEUU, aumentando el anticomunismo.",
+          "Porque la Unión Soviética financiaba directamente el ejército calderonista.",
+          "Porque Costa Rica debió elegir un bando en la Guerra Fría."
+        ],
+        correct: 1,
+        exp: "El inicio de la Guerra Fría generó cuestionamientos a la alianza gobierno-comunistas. La unidad entre el Republicano y Vanguardia Popular era mal vista por EE.UU., creando un aumento del anticomunismo que fue detonante de la guerra."
+      },
+      {
+        q: "¿Cuánto duró el conflicto armado y cuándo finalizó?",
+        opts: [
+          "Dos años, finalizó en 1950.",
+          "Tres meses, finalizó en junio de 1948.",
+          "Cinco semanas, finalizó el 12 de abril con el Acuerdo de la Embajada de México.",
+          "Solo tres días, finalizó el 15 de marzo de 1948."
+        ],
+        correct: 2,
+        exp: "El conflicto duró 5 semanas. El ELN derrotó rápidamente al ejército costarricense y a las milicias del Partido Comunista. Terminó el 12 de abril con el Acuerdo de la Embajada de México."
+      },
+      {
+        q: "¿Cuál fue la contradicción de Figueres con el Pacto de la Embajada de México?",
+        opts: [
+          "Prometió elecciones en 6 meses pero tardó 18 meses.",
+          "Prometió no tomar represalias pero ilegalizó el PC, exilió costarricenses y movilizó calderonistas.",
+          "Prometió mantener el ejército pero lo abolió.",
+          "Prometió devolver los bancos al sector privado pero los estatizó."
+        ],
+        correct: 1,
+        exp: "Figueres se comprometió a no tomar represalias, pero después ilegalizó el Partido Comunista, movilizó a los calderonistas del sector público y envió al exilio a cientos de costarricenses."
+      },
+      {
+        q: "¿Qué estableció la Constitución de 1949 sobre el equilibrio de poderes?",
+        opts: [
+          "Concentró todo el poder en el Ejecutivo para garantizar estabilidad.",
+          "Estableció un sistema de frenos y contrapesos entre los poderes del Estado.",
+          "Eliminó el poder judicial y lo fusionó con el legislativo.",
+          "Creó un cuarto poder independiente controlado por la Iglesia."
+        ],
+        correct: 1,
+        exp: "La Constitución de 1949 estableció las funciones de cada poder y un sistema de frenos y contrapesos para mantener la estabilidad del gobierno."
+      },
+      {
+        q: "¿Cuál es la función del Tribunal Supremo de Elecciones (TSE) creado en 1949?",
+        opts: [
+          "Juzgar los delitos electorales y encarcelar a los fraudes.",
+          "Convocar, organizar y regular los procesos electorales para garantizar su pureza.",
+          "Elegir a los candidatos presidenciales de cada partido.",
+          "Supervisar solo las elecciones municipales del país."
+        ],
+        correct: 1,
+        exp: "El TSE se creó para convocar, organizar y regular los procesos electorales, garantizar la pureza electoral, evitar el fraude, fortalecer la democracia y evitar la intervención de los poderes del Estado."
+      },
+      {
+        q: "¿Qué fue la Junta Fundadora de la Segunda República?",
+        opts: [
+          "El nuevo partido político de Figueres después de ganar la guerra.",
+          "El gobierno provisional de 18 meses encabezado por Figueres que realizó reformas clave.",
+          "El tribunal especial que juzgó a los calderonistas después de la guerra.",
+          "La asamblea que eligió a Ulate como presidente en 1949."
+        ],
+        correct: 1,
+        exp: "Figueres llegó a un acuerdo con Ulate para que durante 18 meses el país fuera dirigido por una Junta Fundadora de la Segunda República, encabezada por el propio Figueres, quien realizó reformas fundamentales."
+      },
+      {
+        q: "¿Qué significó el voto femenino establecido en la Constitución de 1949?",
+        opts: [
+          "Solo las mujeres mayores de 25 años podían votar.",
+          "Las mujeres podían votar en elecciones municipales pero no presidenciales.",
+          "Le otorgó derechos políticos a las mujeres y las reconoció como ciudadanas, fortaleciendo su igualdad y participación.",
+          "Fue una medida temporal que debía ratificarse en 1955."
+        ],
+        correct: 2,
+        exp: "El voto femenino en la Constitución de 1949 le otorgó plenos derechos políticos a las mujeres, las reconoció como ciudadanas y fortaleció la igualdad y participación política de las mujeres costarricenses."
+      }
+    ]
+  }
+];
+
+let currentTopic = null;
+let userAnswers = [];
+
+function startQuiz(idx) {
+  currentTopic = TOPICS[idx];
+  userAnswers = new Array(currentTopic.questions.length).fill(null);
+
+  document.documentElement.style.setProperty('--qcolor', currentTopic.color);
+
+  document.getElementById('home').style.display = 'none';
+  document.getElementById('result-view').style.display = 'none';
+  document.getElementById('quiz-view').style.display = 'block';
+
+  document.getElementById('qh-title').textContent = currentTopic.title;
+  renderQuiz();
+}
+
+function renderQuiz() {
+  const body = document.getElementById('quiz-body');
+  body.innerHTML = '';
+  updateProgress(0);
+
+  currentTopic.questions.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'q-block';
+    div.id = `qblock-${i}`;
+    div.style.animationDelay = `${i * 0.05}s`;
+
+    div.innerHTML = `
+      <div class="q-number">PREGUNTA ${String(i+1).padStart(2,'0')} / ${currentTopic.questions.length}</div>
+      <div class="q-text">${q.q}</div>
+      ${q.opts.map((o, j) => `<button class="opt-btn" id="opt-${i}-${j}" onclick="pick(${i},${j})">${o}</button>`).join('')}
+      <div class="feedback-box" id="fb-${i}"></div>
+    `;
+    body.appendChild(div);
+  });
+
+  // check-button at bottom
+  const btn = document.createElement('div');
+  btn.style = 'text-align:center;margin-top:40px';
+  btn.innerHTML = `<button class="btn-solid" onclick="showResults()">Ver resultados →</button>`;
+  body.appendChild(btn);
+}
+
+function pick(qi, oi) {
+  if (userAnswers[qi] !== null) return;
+  userAnswers[qi] = oi;
+
+  const q = currentTopic.questions[qi];
+  for (let j = 0; j < q.opts.length; j++) {
+    const btn = document.getElementById(`opt-${qi}-${j}`);
+    btn.disabled = true;
+    if (j === q.correct) btn.classList.add('correct');
+    else if (j === oi) btn.classList.add('wrong');
+  }
+
+  const fb = document.getElementById(`fb-${qi}`);
+  fb.style.display = 'block';
+  const ok = oi === q.correct;
+  fb.innerHTML = (ok ? '✅ ' : '❌ ') + q.exp;
+
+  const answered = userAnswers.filter(a => a !== null).length;
+  updateProgress(answered);
+}
+
+function updateProgress(n) {
+  const total = currentTopic.questions.length;
+  document.getElementById('prog-fill').style.width = `${(n/total)*100}%`;
+  document.getElementById('prog-text').textContent = `${n}/${total}`;
+}
+
+function showResults() {
+  const q = currentTopic.questions;
+  let score = 0;
+  const missed = [];
+  q.forEach((item, i) => {
+    if (userAnswers[i] === item.correct) score++;
+    else missed.push({ q: item.q, a: item.opts[item.correct] });
+  });
+
+  const pct = Math.round((score / q.length) * 100);
+
+  document.getElementById('quiz-view').style.display = 'none';
+  document.getElementById('result-view').style.display = 'block';
+
+  document.getElementById('res-score').textContent = score;
+  document.getElementById('res-of').textContent = `de ${q.length} preguntas`;
+
+  const stars = pct >= 90 ? '★★★★★' : pct >= 70 ? '★★★★☆' : pct >= 50 ? '★★★☆☆' : '★★☆☆☆';
+  document.getElementById('res-stars').textContent = stars;
+
+  const msgs = [
+    [90, '¡Excelente dominio del tema! Estás listo/a para el examen. 🏆'],
+    [70, 'Muy bien, conoces los conceptos principales. Repasa los que fallaste. 📚'],
+    [50, 'Vas por buen camino, pero necesitas reforzar algunos puntos. 💪'],
+    [0,  'Este tema necesita más repaso. ¡Vuelve a estudiarlo y reintenta! 🔄']
+  ];
+  document.getElementById('res-msg').textContent = msgs.find(([min]) => pct >= min)[1];
+  document.getElementById('res-detail').textContent = `${pct}% de respuestas correctas en "${currentTopic.title}"`;
+
+  const missedSec = document.getElementById('missed-section');
+  if (missed.length > 0) {
+    missedSec.innerHTML = `
+      <div class="missed-list">
+        <div class="missed-hdr">Preguntas que fallaste (${missed.length})</div>
+        ${missed.map(m => `
+          <div class="missed-item">
+            <div class="mq">${m.q}</div>
+            <div class="ma">✅ Respuesta correcta: ${m.a}</div>
+          </div>`).join('')}
+      </div>`;
+  } else {
+    missedSec.innerHTML = `<p style="color:#3a9e62;margin:20px 0;font-size:1.1rem">🎉 ¡Respondiste todo correctamente!</p>`;
+  }
+
+  window.scrollTo(0,0);
+}
+
+function retryQuiz() {
+  document.getElementById('result-view').style.display = 'none';
+  startQuiz(currentTopic.id);
+}
+
+function goHome() {
+  document.getElementById('quiz-view').style.display = 'none';
+  document.getElementById('result-view').style.display = 'none';
+  document.getElementById('home').style.display = 'flex';
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
